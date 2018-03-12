@@ -1,0 +1,53 @@
+<?php 
+$categoryprods = $block->getProducts(3);
+$imageBlock =  $block->getLayout()->createBlock('Magento\Catalog\Block\Product\ListProduct');
+?>
+
+<div class="popularproductswrapper">
+    <ul class="slides">
+    <?php
+    foreach ($categoryprods as $product) { 
+    $productImage = $imageBlock->getImage($product, 'product_page_main_image');
+    ?>
+        <li class="product-item">
+            <img src="<?php echo $productImage->getImageUrl(); ?>" alt="<?php echo $product->getName(); ?>" />
+            <h2><?php echo $product->getName(); ?></h2>
+            <p><?php echo $product->getShortDescription(); ?></p>
+            <a href="<?php echo $product->getProductUrl(); ?>">View Details</a>
+            <div class="price">
+                <span>
+                <?php 
+                if ($product->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                    $_children = $product->getTypeInstance()->getUsedProducts($product);
+                    $test = array();
+                    foreach ($_children as $child){
+                        $childprice = $child->getPrice();
+                        $test[] = $childprice;
+                    }
+                    if(count($test) == NULL || count($test) == 0) {
+                        echo " ";
+                    } else {
+                        echo "From £" . number_format((float)min($test), 2, '.', '');
+                    }
+                } else {
+                    echo "£" . number_format((float)$product->getPrice(), 2, '.', '');
+                }
+                ?>
+                </span>
+            </div>
+        </li>
+    <?php } ?>
+    </ul>
+</div>
+
+<script type="text/javascript">
+require(['jquery','slickjs'],function($){
+    $(document).ready(function() {
+        $('.slides').slick({
+            infinite: true,
+            slidesToShow: 3,
+            slidesToScroll: 1
+        });
+    });
+});
+</script>
